@@ -829,13 +829,7 @@
 
             // Show loading state (could use SweetAlert loading)
             submitBtn.disabled = true;
-             Swal.showLoading({ // Use SweetAlert loading indicator
-                title: 'กำลังส่งข้อมูล...',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-             });
+             
 
 
             const formData = new FormData(form);
@@ -847,15 +841,14 @@
             })
             .then(response => {
                 console.log('Form submission attempted.');
-                 Swal.close(); // Close loading indicator
+                 // Swal.close(); // Close loading indicator
                  // Show SweetAlert success popup
-                 Swal.fire({
-                    title: 'สำเร็จ!',
-                    text: 'บันทึกข้อมูลเรียบร้อยแล้ว',
-                    icon: 'success',
-                    confirmButtonText: 'ตกลง',
-                    confirmButtonColor: 'var(--button-bg)' // Use action button color
-                 }).then(() => {
+		Swal.fire({
+  		   icon: "success",
+  		   title: "บันทึกข้อมูลสำเร็จ!!",
+  		   showConfirmButton: true,
+  		   timer: 2000
+		}).then(() => {
                     form.reset();
                     form.style.display = 'none'; // Hide form after success
                     document.querySelector('.step-indicator-container').style.display = 'none'; // Hide progress bar too
@@ -875,22 +868,21 @@
             })
             .catch(error => {
                 console.error('Error submitting form:', error);
-                 Swal.close(); // Close loading indicator
+                 // Swal.close(); // Close loading indicator
                  // Show SweetAlert error popup
-                 Swal.fire({
-                    title: 'เกิดข้อผิดพลาด!',
-                    text: 'ไม่สามารถส่งข้อมูลได้ โปรดตรวจสอบการเชื่อมต่ออินเทอร์เน็ต หรือลองอีกครั้ง',
-                    icon: 'error',
-                    confirmButtonText: 'ตกลง',
-                    confirmButtonColor: 'var(--danger-color)'
-                 });
-                submitBtn.disabled = false; // Re-enable button on error
+		Swal.fire({
+  			title: 'เกิดข้อผิดพลาด!',
+  			text: 'ไม่สามารถส่งข้อมูลได้ โปรดตรวจสอบการเชื่อมต่ออินเทอร์เน็ต หรือลองอีกครั้ง',
+  			icon: 'error',
+  			showConfirmButton: false,
+  		   	timer: 1500
+		});
             });
         });
 
         // Initialize the first step and progress bar
         showStep(currentStep);
     </script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 </html>
