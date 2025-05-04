@@ -1,412 +1,816 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <title>เช็คอินครู - โรงเรียนปากช่อง สพม. นครราชสีมา</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <!-- Bootstrap 5 -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  
-  <!-- SweetAlert2 -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  
-  <!-- Signature Pad -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/signature_pad/1.5.3/signature_pad.min.js"></script>
-  
-  <style>
-    body {
-      background-color: #f8f9fa;
-      padding: 20px;
-    }
-    
-    .logo {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-    
-    #digital-clock {
-      font-size: 1.1rem;
-      padding: 10px;
-      background: #e9ecef;
-      border-radius: 10px;
-      text-align: center;
-      font-weight: bold;
-      margin-bottom: 1rem;
-    }
-    
-    #teacher-info {
-      display: flex;
-      align-items: center;
-      margin-top: 10px;
-    }
-    
-    #teacher-info img {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin-right: 15px;
-      border: 2px solid #ddd;
-    }
-    
-    #signature-pad {
-      border: 1px solid #000;
-      background: #fff;
-      width: 100%;
-      height: 150px;
-      margin-bottom: 10px;
-      border-radius: 5px;
-    }
-    
-    .video-container {
-      position: relative;
-      width: 100%;
-      max-width: 100%;
-      margin-top: 10px;
-    }
-    
-    .video-container video,
-    .video-container img {
-      width: 100%;
-      border-radius: 10px;
-    }
-    
-    .camera-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 10px;
-    }
-    
-    .btn-circle {
-      width: 40px;
-      height: 40px;
-      padding: 0;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .time-warning {
-      color: #dc3545;
-      margin-top: 5px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบลงเวลาปฏิบัติหน้าที่ ครูโรงเรียนปากช่อง</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- Custom CSS --- */
+        body {
+            background-color: #f8f9fa; /* Light gray background */
+            font-family: 'Sarabun', sans-serif; /* Thai font */
+        }
+
+        #schoolLogo {
+            max-height: 80px; /* Adjust logo size as needed */
+            width: auto;
+            border-radius: 8px; /* Slightly rounded corners for logo */
+        }
+
+        #clock {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        #teacherInfo {
+            transition: all 0.3s ease-in-out;
+        }
+
+        .teacher-photo {
+            max-width: 120px;
+            height: 120px; /* Make it square */
+            object-fit: cover; /* Crop image nicely */
+            border-radius: 50%; /* Make profile picture circular */
+            border: 3px solid #dee2e6; /* Add a subtle border */
+        }
+
+        .signature-pad-container {
+            position: relative;
+            width: 100%;
+            height: 200px; /* Adjust height as needed */
+            background-color: #ffffff;
+            cursor: crosshair;
+            border: 1px solid #ced4da;
+            border-radius: 0.375rem; /* Match Bootstrap's border-radius */
+        }
+
+        #signatureCanvas {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 0.375rem;
+        }
+
+        #videoFeed {
+            width: 100%;
+            height: auto;
+            max-height: 250px; /* Limit video preview height */
+            display: block; /* Ensure it takes block space */
+            background-color: #343a40; /* Dark background for video area */
+        }
+
+        .captured-photo {
+            max-height: 250px; /* Limit captured photo preview height */
+            display: block; /* Center image */
+            margin-left: auto;
+            margin-right: auto;
+            background-color: #e9ecef; /* Light background for preview area */
+        }
+
+        #statusMessage .alert {
+            margin-bottom: 0;
+        }
+
+        /* Loading spinner styles */
+        .spinner-border {
+            width: 1rem;
+            height: 1rem;
+            border-width: .2em;
+        }
+
+        /* Ensure labels have some bottom margin */
+        .form-label {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Improve button spacing */
+        .btn-group-camera button {
+            margin: 0 5px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 767.98px) {
+            .teacher-photo {
+                max-width: 100px;
+                height: 100px;
+                margin-bottom: 1rem; /* Add space below photo on small screens */
+            }
+            #videoFeed, .captured-photo {
+                max-height: 200px;
+            }
+            .signature-pad-container {
+                height: 150px;
+            }
+        }
+
+    </style>
 </head>
 <body>
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-md-8">
-        <div class="card p-4">
-          <div class="logo">
-            <img src="https://example.com/school-logo.png" alt="โลโก้โรงเรียน" width="100">
-            <h2 class="mt-2">โรงเรียนปากช่อง สพม. นครราชสีมา</h2>
-          </div>
 
-          <div id="digital-clock" class="mb-3"></div>
-
-          <form id="checkin-form">
-            <div class="mb-3">
-              <label for="teacher-code" class="form-label">รหัสครูผู้สอน</label>
-              <input type="text" class="form-control" id="teacher-code" placeholder="กรอกรหัสครู">
-              <div id="teacher-info"></div>
+    <div class="container mt-4 mb-5">
+        <div class="card shadow-sm border-primary">
+            <div class="card-header text-center bg-primary text-white p-3">
+                <img src="https://placehold.co/150x80/0d6efd/ffffff?text=%E0%B9%82%E0%B8%A5%E0%B9%82%E0%B8%81%E0%B9%89" alt="โลโก้โรงเรียนปากช่อง" id="schoolLogo" class="mb-2 img-fluid">
+                <h4 class="mb-1 mt-2">โรงเรียนปากช่อง</h4>
+                <p class="mb-0 small">สำนักงานเขตพื้นที่การศึกษามัธยมศึกษานครราชสีมา</p>
             </div>
-
-            <div class="mb-3">
-              <label for="duty-type" class="form-label">ปฏิบัติหน้าที่</label>
-              <select class="form-select" id="duty-type">
-                <option value="เวรยืนประตู">เวรยืนประตู</option>
-                <option value="ตรวจอาคาร">ตรวจอาคาร</option>
-              </select>
-            </div>
-
-            <div class="mb-3">
-              <label for="location" class="form-label">ตำแหน่งปัจจุบัน</label>
-              <input type="text" class="form-control" id="location" readonly>
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label">ลายมือชื่อ</label>
-              <canvas id="signature-pad" class="form-control mb-2"></canvas>
-              <div class="d-flex justify-content-end">
-                <button type="button" class="btn btn-outline-secondary btn-circle" onclick="clearSignature()">
-                  <i class="fas fa-undo"></i>
-                </button>
-              </div>
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label">ถ่ายภาพ</label>
-              <div class="video-container position-relative">
-                <video id="video" autoplay class="w-100" style="display: block;"></video>
-                <div id="camera-overlay" class="camera-overlay d-none">
-                  <i class="fas fa-camera camera-icon"></i>
+            <div class="card-body p-4">
+                <div id="clock" class="alert alert-info text-center shadow-sm" role="alert">
+                    <i class="fas fa-clock me-2"></i> กำลังโหลดเวลา...
                 </div>
-                <img id="captured-photo" class="w-100" style="display: none;">
-              </div>
-              <div class="d-flex justify-content-between mt-2">
-                <button type="button" class="btn btn-primary" onclick="capturePhoto()">
-                  <i class="fas fa-camera"></i> ถ่ายภาพ
-                </button>
-                <button type="button" class="btn btn-outline-secondary d-none" id="retake-btn" onclick="retakePhoto()">
-                  <i class="fas fa-redo"></i> ถ่ายใหม่
-                </button>
-              </div>
+
+                <form id="checkinForm" novalidate> <div class="mb-3">
+                        <label for="teacherId" class="form-label fw-bold"><i class="fas fa-id-card me-2 text-primary"></i>รหัสครูผู้สอน</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="teacherId" name="teacherId" required placeholder="กรอกรหัสครูแล้วกดค้นหา">
+                            <button class="btn btn-outline-primary" type="button" id="findTeacherBtn" title="ค้นหาข้อมูลครู">
+                                <i class="fas fa-search"></i> <span class="d-none d-sm-inline">ค้นหา</span>
+                            </button>
+                        </div>
+                         <div id="teacherLookupStatus" class="form-text text-danger mt-1"></div>
+                    </div>
+
+                    <div id="teacherInfo" class="mb-4 p-3 border rounded bg-light shadow-sm" style="display: none;">
+                        <div class="row align-items-center">
+                            <div class="col-md-3 text-center mb-3 mb-md-0">
+                                <img src="https://placehold.co/120x120/adb5bd/ffffff?text=%E0%B8%A3%E0%B8%B9%E0%B8%9B%E0%B8%84%E0%B8%A3%E0%B8%B9" alt="รูปครู" id="teacherPhoto" class="teacher-photo">
+                            </div>
+                            <div class="col-md-9">
+                                <p class="mb-1"><strong><i class="fas fa-user me-2"></i>ชื่อ-สกุล:</strong> <span id="teacherName"></span></p>
+                                <p class="mb-1"><strong><i class="fas fa-chalkboard-teacher me-2"></i>กลุ่มสาระฯ:</strong> <span id="teacherDepartment"></span></p>
+                                <p class="mb-0"><strong><i class="fas fa-user-tie me-2"></i>ตำแหน่ง:</strong> <span id="teacherPosition"></span></p>
+                                <input type="hidden" id="hiddenTeacherName" name="teacherName">
+                                <input type="hidden" id="hiddenTeacherDepartment" name="teacherDepartment">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold"><i class="fas fa-tasks me-2 text-primary"></i>เลือกการปฏิบัติหน้าที่</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="dutyType" id="dutyGate" value="เวรยืนประตู" required>
+                            <label class="form-check-label" for="dutyGate">
+                                <i class="fas fa-door-open text-success me-1"></i> เวรยืนประตู
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="dutyType" id="dutyBuilding" value="ตรวจอาคาร" required>
+                            <label class="form-check-label" for="dutyBuilding">
+                                <i class="fas fa-building text-warning me-1"></i> ตรวจอาคาร
+                            </label>
+                        </div>
+                        <div id="dutyTypeError" class="invalid-feedback d-block"></div> </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold"><i class="fas fa-map-marker-alt me-2 text-danger"></i>ตำแหน่งที่ตั้งปัจจุบัน</label>
+                        <div id="locationInfo" class="form-control" style="min-height: 40px; background-color: #e9ecef;">
+                            <span class="text-muted">กำลังค้นหาตำแหน่ง...</span>
+                            <button type="button" class="btn btn-sm btn-outline-secondary ms-2 py-0 px-1" id="getLocationBtn" title="ลองค้นหาตำแหน่งอีกครั้ง">
+                                <i class="fas fa-sync"></i>
+                            </button>
+                        </div>
+                         <input type="hidden" id="latitude" name="latitude" required>
+                         <input type="hidden" id="longitude" name="longitude" required>
+                         <div id="locationError" class="form-text text-danger mt-1"></div>
+                    </div>
+
+                    <div class="mb-3">
+                         <label for="signatureCanvas" class="form-label fw-bold"><i class="fas fa-signature me-2 text-success"></i>ลงลายมือชื่อ</label>
+                         <div class="signature-pad-container">
+                            <canvas id="signatureCanvas"></canvas>
+                         </div>
+                         <button type="button" class="btn btn-sm btn-outline-secondary mt-2" id="resetSignatureBtn"><i class="fas fa-eraser me-1"></i> ล้างลายเซ็น</button>
+                         <input type="hidden" id="signatureData" name="signatureData" required>
+                         <div id="signatureError" class="invalid-feedback d-block"></div> </div>
+
+                     <div class="mb-4">
+                        <label class="form-label fw-bold"><i class="fas fa-camera me-2 text-info"></i>ถ่ายภาพยืนยัน ณ ขณะนั้น</label>
+                        <div class="row g-3 align-items-start">
+                            <div class="col-md-6">
+                                <video id="videoFeed" playsinline autoplay muted class="img-fluid border rounded bg-dark"></video>
+                                <canvas id="photoCanvas" style="display:none;"></canvas> </div>
+                             <div class="col-md-6 text-center">
+                                 <img id="capturedPhotoPreview" src="https://placehold.co/300x250/e9ecef/6c757d?text=%E0%B8%A0%E0%B8%B2%E0%B8%9E%E0%B8%95%E0%B8%B1%E0%B8%A7%E0%B8%AD%E0%B8%A2%E0%B9%88%E0%B8%B2%E0%B8%87" alt="ภาพที่ถ่าย" class="img-fluid border rounded mb-2 captured-photo">
+                                 <input type="hidden" id="photoData" name="photoData" required>
+                             </div>
+                        </div>
+                         <div class="mt-2 text-center btn-group-camera">
+                            <button type="button" class="btn btn-sm btn-info" id="startCameraBtn"><i class="fas fa-video me-1"></i> เปิดกล้อง</button>
+                            <button type="button" class="btn btn-sm btn-success" id="capturePhotoBtn" disabled><i class="fas fa-camera-retro me-1"></i> ถ่ายภาพ</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="resetPhotoBtn" disabled><i class="fas fa-undo me-1"></i> ถ่ายใหม่</button>
+                         </div>
+                         <div id="cameraError" class="form-text text-danger mt-1 text-center"></div>
+                         <div id="photoError" class="invalid-feedback d-block text-center"></div> </div>
+
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg fw-bold shadow" id="submitBtn" disabled>
+                            <i class="fas fa-clock me-2"></i> <span id="submitBtnText">รอเวลาเช็คอิน (07:00 - 08:00 น.)</span>
+                        </button>
+                    </div>
+
+                    <div id="statusMessage" class="mt-3"></div>
+
+                </form>
+            </div> <div class="card-footer text-muted text-center small p-2">
+                 ระบบลงเวลาปฏิบัติหน้าที่ โรงเรียนปากช่อง
             </div>
+        </div> </div> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
 
-            <button id="checkin-btn" type="button" class="btn btn-success w-100 mt-3" onclick="submitForm()">
-              <i class="fas fa-check"></i> เช็คอิน
-            </button>
-            <p id="time-warning" class="time-warning mt-2 text-center"></p>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
+    <script>
+        // --- Custom JavaScript ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- CONFIGURATION ---
+            // !!! สำคัญมาก: กรุณาแทนที่ด้วย URL จริงของ Google Apps Script Web App ของคุณ !!!
+            const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz6ekEQEzy4nsvAvIT5-LP_eO0DEQ4ZG4WrqVC-wpR1zDHXinVQ4HbS47Q3C-BMgJjg/exec';
+            // URL สำหรับค้นหาข้อมูลครู (อาจเป็น URL เดียวกับ SCRIPT_URL หรือแยกกัน)
+            // ตัวอย่างนี้ใช้ URL เดียวกัน และส่งพารามิเตอร์ action=getTeacherInfo
+            const TEACHER_LOOKUP_URL = SCRIPT_URL + '?action=getTeacherInfo&id=';
 
-  <!-- Font Awesome -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+            const CHECKIN_START_HOUR = 7; // เวลาเริ่มเช็คอิน (7 โมงเช้า)
+            const CHECKIN_END_HOUR = 8;   // เวลาสิ้นสุดเช็คอิน (ก่อน 8 โมงเช้า)
 
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            // --- DOM ELEMENTS ---
+            const clockElement = document.getElementById('clock');
+            const checkinForm = document.getElementById('checkinForm');
+            const teacherIdInput = document.getElementById('teacherId');
+            const findTeacherBtn = document.getElementById('findTeacherBtn');
+            const teacherLookupStatus = document.getElementById('teacherLookupStatus');
+            const teacherInfoDiv = document.getElementById('teacherInfo');
+            const teacherPhoto = document.getElementById('teacherPhoto');
+            const teacherNameSpan = document.getElementById('teacherName');
+            const teacherDepartmentSpan = document.getElementById('teacherDepartment');
+            const teacherPositionSpan = document.getElementById('teacherPosition');
+            const hiddenTeacherName = document.getElementById('hiddenTeacherName');
+            const hiddenTeacherDepartment = document.getElementById('hiddenTeacherDepartment');
+            const locationInfoDiv = document.getElementById('locationInfo');
+            const getLocationBtn = document.getElementById('getLocationBtn');
+            const latitudeInput = document.getElementById('latitude');
+            const longitudeInput = document.getElementById('longitude');
+            const locationErrorDiv = document.getElementById('locationError');
+            const signatureCanvas = document.getElementById('signatureCanvas');
+            const resetSignatureBtn = document.getElementById('resetSignatureBtn');
+            const signatureDataInput = document.getElementById('signatureData');
+            const signatureErrorDiv = document.getElementById('signatureError');
+            const videoFeed = document.getElementById('videoFeed');
+            const photoCanvas = document.getElementById('photoCanvas');
+            const capturedPhotoPreview = document.getElementById('capturedPhotoPreview');
+            const photoDataInput = document.getElementById('photoData');
+            const startCameraBtn = document.getElementById('startCameraBtn');
+            const capturePhotoBtn = document.getElementById('capturePhotoBtn');
+            const resetPhotoBtn = document.getElementById('resetPhotoBtn');
+            const cameraErrorDiv = document.getElementById('cameraError');
+            const photoErrorDiv = document.getElementById('photoError');
+            const submitBtn = document.getElementById('submitBtn');
+            const submitBtnText = document.getElementById('submitBtnText');
+            const statusMessage = document.getElementById('statusMessage');
+            const dutyTypeErrorDiv = document.getElementById('dutyTypeError');
 
-  <script>
-    // แสดงนาฬิกาดิจิทัลแบบเรียลไทม์
-    function updateDigitalClock() {
-      const now = new Date();
-      const days = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
-      const months = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 
-                     'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
-      
-      const dayName = days[now.getDay()];
-      const date = now.getDate();
-      const monthName = months[now.getMonth()];
-      const year = now.getFullYear() + 543; // พ.ศ.
-      const hours = String(now.getHours()).padStart(2, '0');
-      const minutes = String(now.getMinutes()).padStart(2, '0');
-      const seconds = String(now.getSeconds()).padStart(2, '0');
-      
-      const thaiDate = `วัน${dayName}ที่ ${date} ${monthName} พ.ศ.${year} เวลา ${hours}:${minutes}:${seconds} น.`;
-      document.getElementById('digital-clock').textContent = thaiDate;
-    }
+            // --- STATE VARIABLES ---
+            let signaturePad;
+            let stream = null; // สำหรับ Camera stream
+            let teacherDataCache = null; // เก็บข้อมูลครูที่ค้นหาเจอ
+            let locationWatcher = null; // สำหรับติดตามตำแหน่ง (ถ้าต้องการ)
 
-    // อัปเดตเวลาทุก 1 วินาที
-    setInterval(updateDigitalClock, 1000);
-    
-    // ตรวจสอบเวลาเปิดใช้งานปุ่ม
-    function checkTime() {
-      const now = new Date();
-      const hours = now.getHours();
-      const minutes = now.getMinutes();
-      const isEnabled = (hours === 7 && minutes >= 0 && minutes <= 59) || 
-                        (hours === 8 && minutes === 0);
-      
-      const checkinBtn = document.getElementById('checkin-btn');
-      const timeWarning = document.getElementById('time-warning');
-      
-      checkinBtn.disabled = !isEnabled;
-      
-      if (isEnabled) {
-        timeWarning.textContent = '';
-      } else {
-        timeWarning.textContent = 'สามารถใช้งานได้ระหว่าง 07:00-08:00 น.';
-      }
-    }
+            // --- INITIALIZATION ---
+            initializeClock();
+            initializeSignaturePad();
+            initializeGeolocation(); // ลองหาตำแหน่งเมื่อโหลดหน้า
+            setInterval(updateClockAndButtonState, 1000); // อัปเดตนาฬิกาและปุ่มทุกวินาที
+            window.addEventListener('resize', resizeCanvas); // ปรับขนาด canvas เมื่อหน้าจอเปลี่ยน
 
-    // ดึงข้อมูลครูจาก Google Sheet
-    document.getElementById('teacher-code').addEventListener('input', function () {
-      const code = this.value;
-      if (code.length >= 3) {
-        fetch('https://script.google.com/macros/s/AKfycbxt7UhN1kGeCvDLrOyW_1ggRx0p3OdmE4Y3YmigoZp-l7HLECxzZ38uyHNZHFSUO-96Og/exec' + '?teacherCode=' + code)
-          .then(response => response.json())
-          .then(data => {
-            const infoDiv = document.getElementById('teacher-info');
-            if (data.error) {
-              infoDiv.innerHTML = '<p class="text-danger">ไม่พบข้อมูลครู</p>';
-            } else {
-              infoDiv.innerHTML = `
-                <img src="${data.image}" alt="รูปครู">
-                <div id="teacher-details">
-                  <strong>${data.name}</strong>
-                  <small class="d-block">${data.subject}</small>
-                </div>
-              `;
+            // --- FUNCTIONS ---
+
+            // 1. Clock Functionality
+            function initializeClock() {
+                updateClockAndButtonState(); // เรียกครั้งแรก
             }
-          })
-          .catch(error => {
-            console.error('Error fetching teacher data:', error);
-            const infoDiv = document.getElementById('teacher-info');
-            infoDiv.innerHTML = '<p class="text-danger">เกิดข้อผิดพลาดในการดึงข้อมูลครู</p>';
-          });
-      }
-    });
 
-    // ลายมือชื่อ
-    const canvas = document.getElementById("signature-pad");
-    const signaturePad = new SignaturePad(canvas);
+            function updateClockAndButtonState() {
+                const now = new Date();
+                const year = now.getFullYear() + 543; // พ.ศ.
+                const optionsDate = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                const optionsTime = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
 
-    function resizeCanvas() {
-      const ratio = Math.max(window.devicePixelRatio || 1, 1);
-      canvas.width = canvas.offsetWidth * ratio;
-      canvas.height = canvas.offsetHeight * ratio;
-      canvas.getContext("2d").scale(ratio, ratio);
-      signaturePad.clear(); // ลบลายมือชื่อเดิม
-    }
+                // บังคับใช้ Locale ไทย
+                const thaiDate = now.toLocaleDateString('th-TH', optionsDate).replace(String(now.getFullYear()), String(year));
+                const thaiTime = now.toLocaleTimeString('th-TH', optionsTime);
 
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
+                clockElement.innerHTML = `<i class="fas fa-clock me-2"></i> ${thaiDate} เวลา ${thaiTime} น.`;
 
-    // ฟังก์ชันรีเซ็ตลายเซ็น
-    function clearSignature() {
-      signaturePad.clear();
-    }
+                // ตรวจสอบช่วงเวลาเช็คอิน
+                const currentHour = now.getHours();
+                const isCheckinTime = currentHour >= CHECKIN_START_HOUR && currentHour < CHECKIN_END_HOUR;
 
-    // ถ่ายภาพ
-    const video = document.getElementById('video');
-    const capturedPhoto = document.getElementById('captured-photo');
-    const cameraOverlay = document.getElementById('camera-overlay');
-    const retakeBtn = document.getElementById('retake-btn');
-
-    navigator.mediaDevices.getUserMedia({ video: true })
-      .then(stream => {
-        video.srcObject = stream;
-      })
-      .catch(err => {
-        Swal.fire({
-          icon: 'error',
-          title: 'ไม่สามารถเข้าถึงกล้องได้',
-          text: 'กรุณาอนุญาตการเข้าถึงกล้องก่อนใช้งาน',
-          confirmButtonText: 'ตกลง'
-        });
-      });
-
-    function capturePhoto() {
-      const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d');
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      capturedPhoto.src = canvas.toDataURL('image/png');
-      
-      // ซ่อนวิดีโอและแสดงรูปภาพที่ถ่าย
-      video.style.display = 'none';
-      capturedPhoto.style.display = 'block';
-      cameraOverlay.classList.add('d-none');
-      retakeBtn.classList.remove('d-none');
-    }
-
-    function retakePhoto() {
-      capturedPhoto.style.display = 'none';
-      video.style.display = 'block';
-      retakeBtn.classList.add('d-none');
-      
-      if (video.srcObject) {
-        video.srcObject.getTracks().forEach(track => track.stop());
-      }
-      
-      navigator.mediaDevices.getUserMedia({ video: true })
-        .then(stream => {
-          video.srcObject = stream;
-        });
-    }
-
-    // ส่งข้อมูล
-    function submitForm() {
-      const formData = new FormData();
-      const now = new Date();
-      const timestamp = now.toISOString();
-      const teacherCode = document.getElementById('teacher-code').value;
-      const dutyType = document.getElementById('duty-type').value;
-      const location = document.getElementById('location').value;
-      const teacherInfo = document.getElementById('teacher-details');
-      const teacherName = teacherInfo ? teacherInfo.querySelector('strong')?.textContent || "ไม่พบข้อมูล" : "ไม่พบข้อมูล";
-
-      // เพิ่มข้อมูลพื้นฐานลง FormData
-      formData.append('timestamp', timestamp);
-      formData.append('teacherCode', teacherCode);
-      formData.append('dutyType', dutyType);
-      formData.append('location', location);
-
-      // เพิ่มลายมือชื่อ
-      if (!signaturePad.isEmpty()) {
-        formData.append('signature', signaturePad.toDataURL());
-      }
-
-      // เพิ่มรูปภาพ
-      if (capturedPhoto.src && capturedPhoto.src !== 'data:,') {
-        fetch(capturedPhoto.src)
-          .then(res => res.blob())
-          .then(blob => {
-            formData.append('photo', blob, 'photo.png');
-
-            // ส่งข้อมูลไปยัง Apps Script
-            fetch('YOUR_WEB_APP_URL', {
-              method: 'POST',
-              body: formData
-            })
-              .then(response => {
-                if (response.ok) {
-                  // แสดง SweetAlert พร้อมข้อมูล
-                  Swal.fire({
-                    icon: 'success',
-                    title: 'ส่งข้อมูลสำเร็จ!',
-                    html: `
-                      <div style="text-align:left; font-size:16px;">
-                        <p><strong>วันที่และเวลา:</strong> ${now.toLocaleString('th-TH', { 
-                          year: 'numeric', 
-                          month: 'long', 
-                          day: 'numeric', 
-                          hour: '2-digit', 
-                          minute: '2-digit', 
-                          second: '2-digit'
-                        })} น.</p>
-                        <p><strong>ชื่อครู:</strong> ${teacherName}</p>
-                        <p><strong>รหัสครู:</strong> ${teacherCode}</p>
-                        <p><strong>ปฏิบัติหน้าที่:</strong> ${dutyType}</p>
-                        <p><strong>ตำแหน่ง:</strong> ${location}</p>
-                      </div>
-                    `,
-                    confirmButtonText: 'ปิด'
-                  }).then(() => {
-                    // รีเซ็ตหน้าหลังปิด
-                    window.location.reload();
-                  });
+                if (isCheckinTime) {
+                    // เปิดใช้งานปุ่มเฉพาะเมื่อข้อมูลอื่นๆ (เช่น ครู, ตำแหน่ง) ถูกโหลดแล้ว
+                    // การตรวจสอบเต็มรูปแบบจะอยู่ใน form submit handler
+                    submitBtn.disabled = false; // อาจจะต้องปิดไว้ก่อนจนกว่าข้อมูลครบ
+                    submitBtnText.textContent = 'เช็คอิน';
+                    submitBtn.classList.remove('btn-secondary');
+                    submitBtn.classList.add('btn-primary');
+                    submitBtn.querySelector('i').className = 'fas fa-check-circle me-2';
+                } else {
+                    submitBtn.disabled = true;
+                    submitBtnText.textContent = `นอกเวลาเช็คอิน (${String(CHECKIN_START_HOUR).padStart(2, '0')}:00 - ${String(CHECKIN_END_HOUR).padStart(2, '0')}:00 น.)`;
+                    submitBtn.classList.remove('btn-primary');
+                    submitBtn.classList.add('btn-secondary');
+                     submitBtn.querySelector('i').className = 'fas fa-times-circle me-2';
                 }
-              })
-              .catch(error => {
-                console.error('Error:', error);
-                Swal.fire({
-                  icon: 'error',
-                  title: 'เกิดข้อผิดพลาด',
-                  text: 'ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่อีกครั้ง',
-                  confirmButtonText: 'ปิด'
-                });
-              });
-          });
-      } else {
-        Swal.fire({
-          icon: 'warning',
-          title: 'กรุณาถ่ายภาพ',
-          text: 'กรุณาถ่ายภาพก่อนส่งข้อมูล',
-          confirmButtonText: 'ปิด'
-        });
-      }
-    }
+                // การ disable/enable จริงๆ ควรทำหลังจาก validate ข้อมูลครบถ้วนแล้ว
+            }
 
-    // เรียกใช้ฟังก์ชันเริ่มต้น
-    updateDigitalClock();
-    checkTime();
-    setInterval(checkTime, 60000); // ตรวจสอบทุก 1 นาที
-  </script>
+            // 2. Teacher Lookup
+            findTeacherBtn.addEventListener('click', fetchTeacherData);
+            teacherIdInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault(); // ป้องกันการ submit ฟอร์ม
+                    fetchTeacherData();
+                }
+            });
+
+            async function fetchTeacherData() {
+                const teacherId = teacherIdInput.value.trim();
+                if (!teacherId) {
+                    teacherLookupStatus.textContent = 'กรุณากรอกรหัสครู';
+                    teacherIdInput.focus();
+                    return;
+                }
+
+                teacherLookupStatus.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> กำลังค้นหา...';
+                teacherInfoDiv.style.display = 'none'; // ซ่อนข้อมูลเก่า
+                teacherDataCache = null; // ล้างแคช
+                clearValidationErrors(); // ล้าง error เก่า
+
+                // ตรวจสอบว่า URL ถูกตั้งค่าหรือยัง
+                if (SCRIPT_URL === 'YOUR_APPS_SCRIPT_WEB_APP_URL') {
+                     teacherLookupStatus.textContent = 'ข้อผิดพลาด: กรุณาตั้งค่า URL ของ Apps Script ในโค้ด JavaScript ก่อน';
+                     return;
+                 }
+
+
+                try {
+                    // สำคัญ: ต้องมั่นใจว่า Apps Script มี doGet(e) ที่รองรับ
+                    // e.parameter.action === 'getTeacherInfo' และ e.parameter.id
+                    const lookupUrl = `${TEACHER_LOOKUP_URL}${encodeURIComponent(teacherId)}`;
+                    const response = await fetch(lookupUrl);
+
+                    if (!response.ok) {
+                        throw new Error(`ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ (Status: ${response.status})`);
+                    }
+
+                     // ตรวจสอบ content type ก่อน parse JSON
+                     const contentType = response.headers.get("content-type");
+                     if (!contentType || !contentType.includes("application/json")) {
+                         // อาจเป็นข้อความ error จาก Apps Script หรือ HTML ทั่วไป
+                         const textResponse = await response.text();
+                         console.error("Received non-JSON response:", textResponse);
+                         throw new Error("เซิร์ฟเวอร์ไม่ได้ตอบกลับเป็น JSON ที่ถูกต้อง");
+                     }
+
+                    const data = await response.json();
+
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+
+                    if (data.found && data.teacher) {
+                        teacherDataCache = data.teacher; // เก็บข้อมูลในแคช
+                        teacherNameSpan.textContent = data.teacher.name || 'N/A';
+                        teacherDepartmentSpan.textContent = data.teacher.department || 'N/A';
+                        teacherPositionSpan.textContent = data.teacher.position || 'N/A';
+                        teacherPhoto.src = data.teacher.photoUrl || 'https://placehold.co/120x120/adb5bd/ffffff?text=%E0%B8%A3%E0%B8%B9%E0%B8%9B%E0%B8%84%E0%B8%A3%E0%B8%B9';
+                        teacherPhoto.alt = `รูปภาพ ${data.teacher.name || 'ครู'}`;
+                        hiddenTeacherName.value = data.teacher.name || '';
+                        hiddenTeacherDepartment.value = data.teacher.department || '';
+
+                        teacherInfoDiv.style.display = 'block';
+                        teacherLookupStatus.textContent = ''; // ล้างสถานะค้นหา
+                    } else {
+                        throw new Error('ไม่พบข้อมูลครูสำหรับรหัสนี้');
+                    }
+
+                } catch (error) {
+                    console.error('Error fetching teacher data:', error);
+                    teacherLookupStatus.textContent = `เกิดข้อผิดพลาด: ${error.message}`;
+                    teacherInfoDiv.style.display = 'none';
+                    teacherPhoto.src = 'https://placehold.co/120x120/adb5bd/ffffff?text=%E0%B8%A3%E0%B8%B9%E0%B8%9B%E0%B8%84%E0%B8%A3%E0%B8%B9'; // รีเซ็ตรูป
+                    teacherDataCache = null;
+                }
+            }
+
+            // 3. Geolocation
+            getLocationBtn.addEventListener('click', initializeGeolocation);
+
+            function initializeGeolocation() {
+                locationInfoDiv.querySelector('span').innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> กำลังค้นหาตำแหน่ง...';
+                locationErrorDiv.textContent = '';
+                latitudeInput.value = '';
+                longitudeInput.value = '';
+                clearValidationErrors(); // ล้าง error เก่า
+
+                if ('geolocation' in navigator) {
+                    // ยกเลิก watcher เก่า ถ้ามี
+                    if (locationWatcher) {
+                        navigator.geolocation.clearWatch(locationWatcher);
+                        locationWatcher = null;
+                    }
+
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const lat = position.coords.latitude;
+                            const lon = position.coords.longitude;
+                            latitudeInput.value = lat;
+                            longitudeInput.value = lon;
+                            locationInfoDiv.querySelector('span').innerHTML = `<i class="fas fa-check-circle text-success me-1"></i> ${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+                             // เพิ่มลิงก์ไปยัง Google Maps
+                            const mapLink = `https://www.google.com/maps?q=${lat},${lon}`;
+                            // ตรวจสอบว่ามี link อยู่แล้วหรือยัง ถ้ายังไม่มีให้เพิ่มเข้าไป
+                            if (!locationInfoDiv.querySelector('a')) {
+                                const linkElement = document.createElement('a');
+                                linkElement.href = mapLink;
+                                linkElement.target = '_blank';
+                                linkElement.rel = 'noopener noreferrer';
+                                linkElement.classList.add('ms-2', 'small');
+                                linkElement.innerHTML = '<i class="fas fa-external-link-alt"></i> ดูแผนที่';
+                                locationInfoDiv.appendChild(linkElement);
+                            } else {
+                                locationInfoDiv.querySelector('a').href = mapLink; // อัปเดต link ถ้ามีอยู่แล้ว
+                            }
+                        },
+                        handleLocationError,
+                        {
+                            enableHighAccuracy: true, // พยายามให้แม่นยำสูง
+                            timeout: 15000,         // หมดเวลาใน 15 วินาที
+                            maximumAge: 0           // ขอตำแหน่งใหม่เสมอ
+                        }
+                    );
+                } else {
+                    handleLocationError({ code: -1, message: 'เบราว์เซอร์นี้ไม่รองรับ Geolocation' });
+                }
+            }
+
+            function handleLocationError(error) {
+                 console.error('Geolocation error:', error);
+                 let message = 'ไม่สามารถรับตำแหน่งได้: ';
+                 switch (error.code) {
+                     case error.PERMISSION_DENIED:
+                         message += 'ผู้ใช้ปฏิเสธการเข้าถึงตำแหน่ง';
+                         break;
+                     case error.POSITION_UNAVAILABLE:
+                         message += 'ข้อมูลตำแหน่งไม่พร้อมใช้งาน';
+                         break;
+                     case error.TIMEOUT:
+                         message += 'หมดเวลาในการค้นหาตำแหน่ง';
+                         break;
+                     case -1: // Custom code for unsupported browser
+                         message = error.message;
+                         break;
+                     default:
+                         message += 'เกิดข้อผิดพลาดที่ไม่รู้จัก';
+                         break;
+                 }
+                 locationInfoDiv.querySelector('span').textContent = 'ข้อผิดพลาดในการรับตำแหน่ง';
+                 locationErrorDiv.textContent = message;
+                 latitudeInput.value = ''; // Clear hidden inputs on error
+                 longitudeInput.value = '';
+            }
+
+
+            // 4. Signature Pad
+            function initializeSignaturePad() {
+                // ปรับขนาด canvas ให้พอดีกับ container
+                resizeCanvas(); // เรียกครั้งแรกเพื่อกำหนดขนาด
+                signaturePad = new SignaturePad(signatureCanvas, {
+                    backgroundColor: 'rgb(255, 255, 255)', // พื้นหลังสีขาวสำหรับแปลงเป็น JPEG
+                    penColor: 'rgb(0, 0, 0)'
+                });
+
+                // ล้างลายเซ็นเมื่อกดปุ่มรีเซ็ต
+                resetSignatureBtn.addEventListener('click', () => {
+                    signaturePad.clear();
+                    signatureDataInput.value = ''; // ล้างข้อมูลใน input ที่ซ่อนอยู่
+                    clearValidationErrors();
+                });
+
+                // ล้าง error เมื่อเริ่มวาด
+                 signatureCanvas.addEventListener('pointerdown', () => {
+                    clearValidationErrors();
+                 });
+            }
+
+            function resizeCanvas() {
+                const ratio = Math.max(window.devicePixelRatio || 1, 1);
+                const canvasContainer = signatureCanvas.parentElement;
+                // ตรวจสอบว่า element มี offsetWidth หรือไม่ (อาจยังไม่แสดงผล)
+                if (!canvasContainer || canvasContainer.offsetWidth === 0) return;
+
+                signatureCanvas.width = canvasContainer.offsetWidth * ratio;
+                signatureCanvas.height = canvasContainer.offsetHeight * ratio;
+                signatureCanvas.getContext("2d").scale(ratio, ratio);
+
+                // ถ้า signaturePad ถูกสร้างแล้ว ให้ clear (การ resize จะล้าง canvas)
+                if (signaturePad) {
+                    signaturePad.clear();
+                }
+            }
+
+            // 5. Camera Functionality
+            startCameraBtn.addEventListener('click', startCamera);
+            capturePhotoBtn.addEventListener('click', capturePhoto);
+            resetPhotoBtn.addEventListener('click', resetPhoto);
+
+            async function startCamera() {
+                cameraErrorDiv.textContent = '';
+                photoErrorDiv.textContent = '';
+                clearValidationErrors();
+
+                if (stream) { // หยุด stream เก่าก่อน ถ้ามี
+                    stream.getTracks().forEach(track => track.stop());
+                    stream = null; // Reset stream variable
+                }
+
+                try {
+                    // ขออนุญาตเข้าถึงกล้อง (พยายามใช้กล้องหน้า)
+                    stream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: 'user' }, // 'user' = front camera, 'environment' = back camera
+                        audio: false
+                    });
+                    videoFeed.srcObject = stream;
+                    videoFeed.style.display = 'block'; // แสดง video feed
+                    capturePhotoBtn.disabled = false;
+                    resetPhotoBtn.disabled = true; // ยังรีเซ็ตไม่ได้จนกว่าจะถ่าย
+                    startCameraBtn.innerHTML = '<i class="fas fa-sync me-1"></i> รีสตาร์ทกล้อง';
+                    // แสดง placeholder ก่อนถ่าย
+                    capturedPhotoPreview.src = 'https://placehold.co/300x250/e9ecef/6c757d?text=%E0%B8%81%E0%B8%94%E0%B8%96%E0%B9%88%E0%B8%B2%E0%B8%A2%E0%B8%A0%E0%B8%B2%E0%B8%9E';
+                    capturedPhotoPreview.alt = 'กดปุ่มถ่ายภาพ';
+                    photoDataInput.value = ''; // ล้างข้อมูลเก่า
+                } catch (err) {
+                    console.error("Camera Error:", err);
+                    cameraErrorDiv.textContent = `ไม่สามารถเข้าถึงกล้องได้: ${err.name} - ${err.message}`;
+                    capturePhotoBtn.disabled = true;
+                    resetPhotoBtn.disabled = true;
+                    startCameraBtn.innerHTML = '<i class="fas fa-video me-1"></i> เปิดกล้อง';
+                    videoFeed.style.display = 'none'; // ซ่อน video ถ้าเปิดไม่ได้
+                }
+            }
+
+            function capturePhoto() {
+                if (!stream || !stream.active) {
+                     cameraErrorDiv.textContent = 'กรุณาเปิดกล้องก่อนถ่ายภาพ';
+                     return;
+                 }
+                clearValidationErrors();
+
+                // กำหนดขนาด canvas ให้เท่ากับขนาด video feed
+                const videoWidth = videoFeed.videoWidth;
+                const videoHeight = videoFeed.videoHeight;
+                if (!videoWidth || !videoHeight) {
+                    cameraErrorDiv.textContent = 'ไม่สามารถอ่านขนาดวิดีโอได้';
+                    return;
+                }
+                photoCanvas.width = videoWidth;
+                photoCanvas.height = videoHeight;
+
+                const context = photoCanvas.getContext('2d');
+                // วาดภาพจาก video ลง canvas
+                context.drawImage(videoFeed, 0, 0, videoWidth, videoHeight);
+
+                // ดึงข้อมูลภาพเป็น Base64 JPEG (ขนาดเล็กกว่า PNG)
+                const dataUrl = photoCanvas.toDataURL('image/jpeg', 0.85); // คุณภาพ 0.85
+
+                capturedPhotoPreview.src = dataUrl;
+                capturedPhotoPreview.alt = 'ภาพที่ถ่าย';
+                // เก็บข้อมูล Base64 *โดยไม่เอา* 'data:image/jpeg;base64,' ไปด้วย
+                photoDataInput.value = dataUrl.split(',')[1];
+
+                // ตัวเลือก: หยุดกล้องหลังจากถ่ายภาพ
+                // stream.getTracks().forEach(track => track.stop());
+                // videoFeed.style.display = 'none'; // ซ่อน video feed หลังถ่าย
+                // startCameraBtn.innerHTML = '<i class="fas fa-video me-1"></i> เปิดกล้อง';
+
+                resetPhotoBtn.disabled = false; // เปิดใช้งานปุ่มรีเซ็ต
+                capturePhotoBtn.disabled = true; // ปิดใช้งานปุ่มถ่ายภาพ (จนกว่าจะรีเซ็ต)
+            }
+
+            function resetPhoto() {
+                clearValidationErrors();
+                // รีสตาร์ทกล้องถ้าหยุดไปแล้ว หรือแค่เคลียร์ภาพถ้ายังทำงานอยู่
+                if (!stream || !stream.active) {
+                     startCamera(); // รีสตาร์ทกล้อง
+                 } else {
+                     // ถ้ากล้องยังเปิดอยู่ แค่เคลียร์ภาพ
+                     capturedPhotoPreview.src = 'https://placehold.co/300x250/e9ecef/6c757d?text=%E0%B8%81%E0%B8%94%E0%B8%96%E0%B9%88%E0%B8%B2%E0%B8%A2%E0%B8%A0%E0%B8%B2%E0%B8%9E';
+                     capturedPhotoPreview.alt = 'กดปุ่มถ่ายภาพ';
+                     photoDataInput.value = ''; // ล้างข้อมูล
+                     photoCanvas.getContext('2d').clearRect(0, 0, photoCanvas.width, photoCanvas.height); // ล้าง canvas
+                     resetPhotoBtn.disabled = true;
+                     capturePhotoBtn.disabled = false; // เปิดใช้งานปุ่มถ่ายภาพอีกครั้ง
+                 }
+            }
+
+            // 6. Form Validation
+            function validateForm() {
+                clearValidationErrors();
+                let isValid = true;
+
+                // ตรวจสอบรหัสครูและการค้นหา
+                if (!teacherIdInput.value.trim()) {
+                    teacherLookupStatus.textContent = 'กรุณากรอกรหัสครู';
+                    isValid = false;
+                } else if (!teacherDataCache) {
+                    teacherLookupStatus.textContent = 'กรุณากดค้นหาข้อมูลครูก่อน';
+                    isValid = false;
+                }
+
+                // ตรวจสอบการเลือกหน้าที่
+                const selectedDuty = document.querySelector('input[name="dutyType"]:checked');
+                if (!selectedDuty) {
+                    dutyTypeErrorDiv.textContent = 'กรุณาเลือกการปฏิบัติหน้าที่';
+                    isValid = false;
+                }
+
+                // ตรวจสอบตำแหน่ง
+                if (!latitudeInput.value || !longitudeInput.value) {
+                    locationErrorDiv.textContent = 'ไม่สามารถระบุตำแหน่งได้ กรุณากดปุ่มรีเฟรชตำแหน่ง';
+                    isValid = false;
+                }
+
+                // ตรวจสอบลายเซ็น
+                if (signaturePad.isEmpty()) {
+                    signatureErrorDiv.textContent = 'กรุณาลงลายมือชื่อ';
+                    isValid = false;
+                }
+
+                // ตรวจสอบรูปภาพ
+                if (!photoDataInput.value) {
+                    photoErrorDiv.textContent = 'กรุณาถ่ายภาพยืนยัน';
+                    isValid = false;
+                }
+
+                 // ตรวจสอบเวลา
+                 const now = new Date();
+                 const currentHour = now.getHours();
+                 if (!(currentHour >= CHECKIN_START_HOUR && currentHour < CHECKIN_END_HOUR)) {
+                     displayMessage(`อยู่นอกเวลาเช็คอิน (${String(CHECKIN_START_HOUR).padStart(2, '0')}:00 - ${String(CHECKIN_END_HOUR).padStart(2, '0')}:00 น.)`, 'warning');
+                     isValid = false; // ไม่ให้ส่งถ้านอกเวลา
+                 }
+
+
+                return isValid;
+            }
+
+            function clearValidationErrors() {
+                teacherLookupStatus.textContent = '';
+                dutyTypeErrorDiv.textContent = '';
+                locationErrorDiv.textContent = '';
+                signatureErrorDiv.textContent = '';
+                photoErrorDiv.textContent = '';
+                cameraErrorDiv.textContent = ''; // เคลียร์ error กล้องด้วย
+                statusMessage.innerHTML = ''; // เคลียร์ status ทั่วไป
+            }
+
+
+            // 7. Form Submission
+            checkinForm.addEventListener('submit', async (e) => {
+                e.preventDefault(); // ป้องกันการ submit แบบปกติ
+                clearValidationErrors(); // เคลียร์ error เก่าก่อน validate ใหม่
+
+                // ตรวจสอบข้อมูลก่อนส่ง
+                if (!validateForm()) {
+                    displayMessage('กรุณากรอกข้อมูลให้ครบถ้วนและถูกต้อง', 'warning');
+                    // เลื่อนไปที่ข้อผิดพลาดแรก (ถ้าต้องการ)
+                    const firstError = checkinForm.querySelector('.text-danger:not(:empty), .invalid-feedback:not(:empty)');
+                    if(firstError) {
+                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                    return; // ไม่ส่งถ้าข้อมูลไม่ถูกต้อง
+                }
+
+                 // ตรวจสอบ URL อีกครั้งก่อนส่ง
+                 if (SCRIPT_URL === 'YOUR_APPS_SCRIPT_WEB_APP_URL') {
+                     displayMessage('ข้อผิดพลาด: กรุณาตั้งค่า URL ของ Apps Script ในโค้ด JavaScript ก่อน', 'danger');
+                     return;
+                 }
+
+                // แสดงสถานะกำลังส่ง และปิดปุ่ม
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> กำลังส่งข้อมูล...';
+                statusMessage.innerHTML = ''; // ล้างข้อความสถานะเก่า
+
+                // เตรียมข้อมูล FormData
+                const formData = new FormData(checkinForm);
+
+                // เพิ่มข้อมูลลายเซ็น (Base64 JPEG โดยไม่มี prefix)
+                if (!signaturePad.isEmpty()) {
+                     const sigDataUrl = signaturePad.toDataURL('image/jpeg', 0.85); // คุณภาพ 0.85
+                     formData.set('signatureData', sigDataUrl.split(',')[1]); // ใช้ set เพื่อแทนที่ค่าจาก hidden input เปล่า
+                }
+                // ข้อมูลรูปภาพ (photoData) ถูกใส่ใน hidden input ตอนถ่ายแล้ว
+
+                // เพิ่ม timestamp ฝั่ง client (server ควรใช้ timestamp ของตัวเองเป็นหลัก)
+                formData.append('clientTimestamp', new Date().toISOString());
+                // เพิ่มข้อมูลครูที่ cache ไว้ (อาจไม่จำเป็นถ้า hidden input ทำงานถูกต้อง)
+                // formData.append('cachedTeacherName', teacherDataCache.name);
+                // formData.append('cachedTeacherDepartment', teacherDataCache.department);
+
+                try {
+                    const response = await fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        body: formData,
+                        // ไม่ควรใช้ 'no-cors' ถ้าต้องการรับ response กลับมา
+                        // mode: 'no-cors'
+                    });
+
+                     // ตรวจสอบว่า response เป็น JSON หรือไม่
+                     const contentType = response.headers.get("content-type");
+                     let result;
+                     if (contentType && contentType.includes("application/json")) {
+                         result = await response.json();
+                     } else {
+                         // ถ้าไม่ใช่ JSON อาจเป็น error text จาก Apps Script
+                         const textResponse = await response.text();
+                         console.error("Server returned non-JSON response:", textResponse);
+                         // พยายามแสดงข้อความถ้ามี หรือสร้างข้อผิดพลาดทั่วไป
+                         throw new Error(textResponse || `เกิดข้อผิดพลาดจากเซิร์ฟเวอร์ (Status: ${response.status})`);
+                     }
+
+
+                    if (result.status === 'success') {
+                        displayMessage(result.message || 'บันทึกข้อมูลสำเร็จ!', 'success');
+                        // รีเซ็ตฟอร์มทั้งหมดหลังส่งสำเร็จ
+                        resetFullForm();
+                    } else {
+                        // แสดงข้อผิดพลาดจาก Apps Script
+                        throw new Error(result.message || 'เกิดข้อผิดพลาดไม่ทราบสาเหตุจากเซิร์ฟเวอร์');
+                    }
+
+                } catch (error) {
+                    console.error('Error submitting form:', error);
+                    displayMessage(`เกิดข้อผิดพลาดในการส่งข้อมูล: ${error.message}`, 'danger');
+                } finally {
+                    // อัปเดตสถานะปุ่มตามเวลาปัจจุบัน (อาจจะยัง disable ถ้านอกเวลา)
+                    updateClockAndButtonState();
+                    // ถ้ายังอยู่ในเวลาเช็คอิน ให้เปิดปุ่ม (แต่ควรเช็ค validate อีกครั้ง)
+                    // submitBtn.disabled = !(now.getHours() >= CHECKIN_START_HOUR && now.getHours() < CHECKIN_END_HOUR);
+                }
+            });
+
+            // 8. Utility Functions
+            function displayMessage(message, type = 'info') {
+                // Type: 'success', 'danger', 'warning', 'info' (ตรงกับ Bootstrap alert)
+                statusMessage.innerHTML = `<div class="alert alert-${type} alert-dismissible fade show shadow-sm" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>`;
+                 // เลื่อนไปดู message
+                 statusMessage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            function resetFullForm() {
+                checkinForm.reset(); // รีเซ็ต input, radio มาตรฐาน
+                signaturePad.clear(); // ล้างลายเซ็น
+                resetPhoto(); // รีเซ็ตกล้องและรูปภาพ
+                teacherInfoDiv.style.display = 'none'; // ซ่อนข้อมูลครู
+                teacherPhoto.src = 'https://placehold.co/120x120/adb5bd/ffffff?text=%E0%B8%A3%E0%B8%B9%E0%B8%9B%E0%B8%84%E0%B8%A3%E0%B8%B9';
+                teacherIdInput.value = '';
+                teacherDataCache = null;
+                latitudeInput.value = '';
+                longitudeInput.value = '';
+                locationInfoDiv.querySelector('span').textContent = 'ตำแหน่งจะแสดงที่นี่';
+                 // ลบ link แผนที่ถ้ามี
+                 const mapLink = locationInfoDiv.querySelector('a');
+                 if (mapLink) mapLink.remove();
+                initializeGeolocation(); // ลองหาตำแหน่งใหม่
+                clearValidationErrors(); // ล้างข้อความ error ทั้งหมด
+                 // หยุด stream กล้อง ถ้ายังทำงานอยู่
+                 if (stream) {
+                     stream.getTracks().forEach(track => track.stop());
+                     stream = null;
+                     startCameraBtn.innerHTML = '<i class="fas fa-video me-1"></i> เปิดกล้อง';
+                     capturePhotoBtn.disabled = true;
+                     resetPhotoBtn.disabled = true;
+                     videoFeed.srcObject = null;
+                     videoFeed.style.display = 'none'; // ซ่อน video feed
+                     capturedPhotoPreview.src = 'https://placehold.co/300x250/e9ecef/6c757d?text=%E0%B8%A0%E0%B8%B2%E0%B8%9E%E0%B8%95%E0%B8%B1%E0%B8%A7%E0%B8%AD%E0%B8%A2%E0%B9%88%E0%B8%B2%E0%B8%87';
+                 }
+                 // เลื่อนกลับไปด้านบนสุด
+                 window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+        }); // End DOMContentLoaded
+    </script>
+
 </body>
 </html>
